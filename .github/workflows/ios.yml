@@ -1,0 +1,34 @@
+name: iOS
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show Xcode
+        run: ls /Applications | grep -i xcode; xcodebuild -version
+      - name: Build unsigned Release
+        working-directory: apps/ios/Orange Cloud
+        run: |
+          xcodebuild \
+            -project "Orange Cloud.xcodeproj" \
+            -scheme "Orange Cloud" \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orange-cloud-ios
+          path: |
+            **/Build/Products/Release-iphoneos/**
+            ~/Library/Developer/Xcode/DerivedData/**/Build/Products/Release-iphoneos/**
+          if-no-files-found: warn
