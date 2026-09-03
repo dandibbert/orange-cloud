@@ -7,11 +7,14 @@ on:
 
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
-      - name: Show Xcode
-        run: ls /Applications | grep -i xcode; xcodebuild -version
+      - name: Select Xcode 26
+        run: |
+          ls /Applications | grep -i xcode
+          sudo xcode-select -s /Applications/Xcode_26.6.app || sudo xcode-select -s /Applications/Xcode.app
+          xcodebuild -version
       - name: Build unsigned Release
         working-directory: apps/ios/Orange Cloud
         run: |
@@ -20,6 +23,7 @@ jobs:
             -scheme "Orange Cloud" \
             -configuration Release \
             -destination "generic/platform=iOS" \
+            -derivedDataPath "$GITHUB_WORKSPACE/build" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             build
@@ -28,7 +32,5 @@ jobs:
         if: always()
         with:
           name: orange-cloud-ios
-          path: |
-            **/Build/Products/Release-iphoneos/**
-            ~/Library/Developer/Xcode/DerivedData/**/Build/Products/Release-iphoneos/**
+          path: build/Build/Products/Release-iphoneos/
           if-no-files-found: warn
