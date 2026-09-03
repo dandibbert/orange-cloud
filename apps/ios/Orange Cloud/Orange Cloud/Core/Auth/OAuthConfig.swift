@@ -20,7 +20,7 @@ nonisolated enum OAuthConfig {
 //    #if DEBUG
 //    static let redirectURI = "http://localhost:3000/oauth/callback"
 //    #else
-    static let redirectURI = "https://orange-oauth-relay.jagerze460.workers.dev/oauth/callback"
+    static let redirectURI = "https://5u.ccwu.cc/oauth/callback"
 //    #endif
 
     // Cloudflare OAuth 端点
