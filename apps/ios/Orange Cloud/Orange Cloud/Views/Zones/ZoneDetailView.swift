@@ -94,6 +94,10 @@ struct ZoneDetailView: View {
     }
 
     var body: some View {
+        applyPresentations(to: scrollContent)
+    }
+
+    private var scrollContent: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 heroCard
@@ -544,6 +548,10 @@ struct ZoneDetailView: View {
             }
             .padding()
         }
+    }
+
+    private func applyPresentations<Content: View>(to content: Content) -> some View {
+        content
         .background { SkyBackground() }
         .navigationTitle(zone.name)
         .navigationBarTitleDisplayMode(.inline)
@@ -613,10 +621,7 @@ struct ZoneDetailView: View {
         }
         .confirmationDialog(
             pendingAction?.title ?? "",
-            isPresented: .init(
-                get: { pendingAction != nil },
-                set: { if !$0 { pendingAction = nil } }
-            ),
+            isPresented: isPendingActionPresented,
             titleVisibility: .visible,
             presenting: pendingAction
         ) { action in
@@ -687,15 +692,26 @@ struct ZoneDetailView: View {
         } message: {
             Text("当前授权未包含此操作所需权限（\(deniedScopeHint)）。点「一键重授权」补齐，无需退出登录。")
         }
-        .alert("操作失败", isPresented: .init(
-            get: { actionsViewModel.error != nil },
-            set: { if !$0 { actionsViewModel.error = nil } }
-        )) {
+        .alert("操作失败", isPresented: isActionErrorPresented) {
             apiErrorDocButton(for: actionsViewModel.error)
             Button("好", role: .cancel) {}
         } message: {
             Text(actionsViewModel.error ?? "")
         }
+    }
+
+    private var isPendingActionPresented: Binding<Bool> {
+        Binding(
+            get: { pendingAction != nil },
+            set: { if !$0 { pendingAction = nil } }
+        )
+    }
+
+    private var isActionErrorPresented: Binding<Bool> {
+        Binding(
+            get: { actionsViewModel.error != nil },
+            set: { if !$0 { actionsViewModel.error = nil } }
+        )
     }
 
     // MARK: - 暂停态与缓存同步
