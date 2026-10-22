@@ -29,10 +29,15 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             build
-      - name: Upload build
+      - name: Package unsigned ipa
+        run: |
+          mkdir -p ipa/Payload
+          cp -R "build/Build/Products/Release-iphoneos/Orange Cloud.app" ipa/Payload/
+          cd ipa && zip -qry "../OrangeCloud-unsigned.ipa" Payload
+      - name: Upload ipa
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: orange-cloud-ios
-          path: build/Build/Products/Release-iphoneos/
+          name: orange-cloud-ipa
+          path: OrangeCloud-unsigned.ipa
           if-no-files-found: warn
